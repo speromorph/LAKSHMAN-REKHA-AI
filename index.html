@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lakshman Rekha AI • Your Digital Boundary for Safe AI</title>
+  
+  <!-- SEO & Social Meta Tags -->
+  <meta name="description" content="Lakshman Rekha AI gives users control over what AI is allowed to KNOW, REMEMBER, PROCESS, and DO. Real-time prompt injection defense, zero-leak privacy, and agent action authorization.">
+  <meta name="keywords" content="AI Security, Prompt Injection, AI Privacy, PII Redaction, AI Agent Guard, Lakshman Rekha, Trust Gateway">
+  <meta name="author" content="Lakshman Rekha AI Security Engineering">
+  
+  <!-- Favicon using the brand logo -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Lucide Icons CDN with inline fallback -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- App Entry Container -->
+  <div id="app">
+    <div style="display: flex; height: 100vh; width: 100vw; align-items: center; justify-content: center; background: #070d18; color: #f59e0b; font-family: sans-serif; flex-direction: column; gap: 16px;">
+      <img src="assets/logo.png" style="width: 80px; height: 80px; border-radius: 18px; box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);" alt="Lakshman Rekha AI" />
+      <div style="font-size: 1.2rem; font-weight: 700; letter-spacing: 0.05em;">LAKSHMAN REKHA AI</div>
+      <div style="font-size: 0.85rem; color: #94a3b8;">Initializing digital boundary perimeter...</div>
+    </div>
+  </div>
+
+  <!-- Master ES Module -->
+  <script type="module" src="js/app.js"></script>
+
+  <!-- Fallback Lucide Initializer -->
+  <script>
+    window.addEventListener('load', function() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>
