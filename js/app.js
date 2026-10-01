@@ -1,6 +1,6 @@
 /**
  * LAKSHMAN REKHA AI - Master Application Controller
- * Coordinates routers, views, services, localization, voice, and demo execution.
+ * Coordinates routers, views, services, localization, voice, command palette, and demo execution.
  */
 
 import { store } from './state/store.js';
@@ -19,8 +19,11 @@ import { codeSecurityEngine } from './services/codeSecurityEngine.js';
 import { voiceAssistant } from './services/voiceAssistant.js';
 import { aiService } from './services/aiProvider.js';
 
+// Components
+import { CommandPalette } from './components/commandPalette.js';
+
 // Views
-import { renderLandingView } from './views/landingView.js';
+import { renderLandingView, initLandingViewEvents } from './views/landingView.js';
 import { renderDashboardView } from './views/dashboardView.js';
 import { renderChatView } from './views/chatView.js';
 import { renderSecurityScannerView } from './views/securityScannerView.js';
@@ -41,12 +44,18 @@ export class LakshmanRekhaApp {
     this.appEl = document.getElementById('app');
     this.toastContainer = null;
     this.unsubscribe = null;
+    this.commandPalette = null;
   }
 
   init() {
     this.unsubscribe = this.store.subscribe(() => this.render());
     this.render();
     this.setupGlobalEvents();
+    this.commandPalette = new CommandPalette(this);
+  }
+
+  navigateTo(viewName) {
+    this.store.setView(viewName);
   }
 
   getT() {
@@ -62,10 +71,11 @@ export class LakshmanRekhaApp {
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    const icon = type === 'critical' ? '🚨' : type === 'success' ? '🛡️' : '✨';
     toast.innerHTML = `
-      <div style="font-size: 1.2rem;">${type === 'critical' ? '🚨' : type === 'success' ? '✅' : '🛡️'}</div>
+      <div style="font-size: 1.2rem;">${icon}</div>
       <div style="flex: 1;">
-        <div style="font-weight: 700; font-size: 0.86rem;">${title}</div>
+        <div style="font-weight: 700; font-size: 0.86rem; color: #ffffff;">${title}</div>
         <div style="font-size: 0.76rem; color: var(--text-secondary);">${message}</div>
       </div>
     `;
@@ -80,7 +90,82 @@ export class LakshmanRekhaApp {
     const t = this.getT();
     const { currentView, language, theme, metrics, pendingAction } = this.store.state;
 
-    // Outer Shell Layout
+    // ----------------------------------------------------
+    // 1. PRIMARY SHOWCASE LANDING VIEW (Matches Mockup)
+    // ----------------------------------------------------
+    if (currentView === 'landing') {
+      this.appEl.innerHTML = `
+        <div style="display: flex; flex-direction: column; width: 100vw; min-height: 100vh;">
+          <!-- Master Top Header (Reference Design) -->
+          <header class="master-header">
+            <a class="master-header-brand" data-view="landing" href="#section-protection">
+              <div class="brand-icon-shield">
+                <div class="brand-icon-shield-inner"></div>
+              </div>
+              <span class="brand-text-name">Lakshman Rekha</span>
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="master-nav-links">
+              <a class="master-nav-link" href="#section-protection">${t.header?.protection || 'Protection'}</a>
+              <a class="master-nav-link" href="#section-threat-monitor">${t.header?.threatMonitor || 'Threat Monitor'}</a>
+              <a class="master-nav-link" href="#section-verification">${t.header?.verification || 'Verification'}</a>
+              <a class="master-nav-link" href="#section-privacy">${t.header?.privacy || 'Privacy'}</a>
+              <a class="master-nav-link" data-view="dashboard" style="color: var(--rekha-gold-light); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                <span>${t.header?.console || 'Console'}</span>
+                <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+              </a>
+            </nav>
+
+            <!-- Right Header Actions -->
+            <div class="master-header-actions">
+              <!-- Global Search Trigger (Command Palette) -->
+              <button class="nav-search-trigger" id="btn-trigger-cmd-search" title="Open Command Palette (⌘K / Ctrl+K)">
+                <i data-lucide="search" style="width: 14px; height: 14px; color: var(--rekha-gold);"></i>
+                <span>${t.header?.searchPlaceholder || 'Search Lakshman Rekha...'}</span>
+                <span class="kbd-shortcut">⌘K</span>
+              </button>
+
+              <!-- Language Switcher -->
+              <button class="btn-header" id="btn-lang-toggle" title="Switch Language English / Hindi">
+                <i data-lucide="languages" style="width: 14px; height: 14px;"></i>
+                <span>${language === 'en' ? 'हिन्दी (HI)' : 'English (EN)'}</span>
+              </button>
+
+              <!-- Active Status Badge -->
+              <div class="status-pill-perimeter" title="Lakshman Rekha perimeter shield actively enforcing boundaries">
+                <span class="status-pulse-dot-safe"></span>
+                <span>${t.header?.perimeterActive || 'Perimeter active'}</span>
+              </div>
+            </div>
+          </header>
+
+          <!-- Main Scrollable Content -->
+          <div class="main-wrapper" id="main-content-scroll">
+            ${renderLandingView(this.store, t)}
+          </div>
+        </div>
+
+        <!-- Action Confirmation Modal (for Agent Permission requests) -->
+        ${pendingAction ? this.renderActionModal(pendingAction) : ''}
+
+        <!-- Demo Tour Modal Container -->
+        <div id="demo-tour-modal-host"></div>
+      `;
+
+      // Refresh Lucide Icons safely
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+
+      // Initialize canvas and landing interactions
+      initLandingViewEvents(this.store, this);
+      return;
+    }
+
+    // ----------------------------------------------------
+    // 2. CONSOLE & OPERATIONS VIEW (Dashboard, Chat, Scanners, Vault, etc.)
+    // ----------------------------------------------------
     this.appEl.innerHTML = `
       <div class="app-container">
         <!-- Sidebar Navigation -->
@@ -96,7 +181,11 @@ export class LakshmanRekhaApp {
           </div>
 
           <nav class="sidebar-nav">
-            <div class="nav-section-title">Core Operations</div>
+            <div class="nav-section-title">Overview</div>
+            <a class="nav-item ${currentView === 'landing' ? 'active' : ''}" data-view="landing">
+              <span class="nav-icon"><i data-lucide="compass"></i></span>
+              <span>Protection Showcase</span>
+            </a>
             <a class="nav-item ${currentView === 'dashboard' ? 'active' : ''}" data-view="dashboard">
               <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
               <span>${t.nav.dashboard}</span>
@@ -151,10 +240,6 @@ export class LakshmanRekhaApp {
             </a>
 
             <div class="nav-section-title">System</div>
-            <a class="nav-item ${currentView === 'landing' ? 'active' : ''}" data-view="landing">
-              <span class="nav-icon"><i data-lucide="compass"></i></span>
-              <span>Gateway Tour</span>
-            </a>
             <a class="nav-item ${currentView === 'settings' ? 'active' : ''}" data-view="settings">
               <span class="nav-icon"><i data-lucide="settings"></i></span>
               <span>${t.nav.settings}</span>
@@ -165,12 +250,12 @@ export class LakshmanRekhaApp {
             <div class="user-profile">
               <div class="user-avatar">LR</div>
               <div class="user-info">
-                <span class="user-name">Local Gateway</span>
-                <span class="user-role">Perimeter Active</span>
+                <span style="font-weight: 700; font-size: 0.85rem; color: #ffffff;">Local Gateway</span>
+                <span style="font-size: 0.72rem; color: var(--status-safe);">Perimeter Active</span>
               </div>
             </div>
             <button class="btn-header" id="btn-quick-theme" title="Toggle Theme" style="padding: 6px 8px;">
-              ${theme === 'dark' ? '🌙' : '☀️'}
+              ${theme === 'dark' ? '☀️' : '🌙'}
             </button>
           </div>
         </aside>
@@ -179,47 +264,56 @@ export class LakshmanRekhaApp {
         <main class="main-wrapper">
           <!-- Header -->
           <header class="top-header">
-            <div class="header-left">
+            <div style="display: flex; align-items: center; gap: 14px;">
               <button class="mobile-menu-btn" id="btn-toggle-sidebar" aria-label="Toggle Navigation">
                 <i data-lucide="menu"></i>
               </button>
-              <div class="header-title-wrap">
-                <h1 class="page-title">${t.nav[currentView] || 'Overview'}</h1>
-                <span class="header-tagline-text" style="font-size: 0.76rem; color: var(--text-muted); margin-left: 8px;">
-                  — ${t.brand.tagline}
-                </span>
-              </div>
+              <button class="btn btn-secondary" data-view="landing" style="padding: 6px 14px; font-size: 0.82rem; border-radius: var(--radius-full);">
+                <i data-lucide="arrow-left" style="width: 14px;"></i>
+                <span>Back to Overview</span>
+              </button>
+              <h1 class="page-title" style="font-size: 1.2rem; font-weight: 700; margin: 0;">${t.nav[currentView] || 'Console'}</h1>
             </div>
 
-            <div class="header-right">
-              <!-- Language Selector Button -->
-              <button class="btn-header" id="btn-lang-toggle" title="Switch Language English / Hindi">
-                <i data-lucide="languages" style="width: 15px;"></i>
-                <span>${language === 'en' ? 'हिन्दी (Hindi)' : 'English'}</span>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <!-- Search Trigger -->
+              <button class="nav-search-trigger" id="btn-trigger-cmd-search-console">
+                <i data-lucide="search" style="width: 14px; color: var(--rekha-gold);"></i>
+                <span>Search (⌘K)</span>
               </button>
 
-              <!-- Hackathon Demo Tour Button -->
-              <button class="btn btn-demo" id="btn-open-demo-tour">
-                <i data-lucide="sparkles" style="width: 15px;"></i>
-                <span>Demo Mode</span>
+              <!-- Language Selector Button -->
+              <button class="btn-header" id="btn-lang-toggle" title="Switch Language English / Hindi">
+                <i data-lucide="languages" style="width: 14px;"></i>
+                <span>${language === 'en' ? 'हिन्दी' : 'English'}</span>
+              </button>
+
+              <!-- Demo Mode Button -->
+              <button class="btn btn-secondary" id="btn-open-demo-tour" style="padding: 7px 14px; font-size: 0.82rem;">
+                <i data-lucide="sparkles" style="width: 14px; color: var(--rekha-gold);"></i>
+                <span>Demo Tour</span>
               </button>
 
               <!-- Active Status Badge -->
-              <div class="status-pill active" title="Lakshman Rekha Boundary Enforcement is fully operational">
-                <span class="status-pulse-dot"></span>
+              <div class="status-pill-perimeter">
+                <span class="status-pulse-dot-safe"></span>
                 <span>Protected</span>
               </div>
             </div>
           </header>
 
           <!-- Dynamic View Container -->
-          <div class="content-area" id="main-content-view">
+          <div class="content-area" id="main-content-view" style="flex: 1; padding: 24px; overflow-y: auto;">
             ${this.renderViewContent(currentView, t)}
           </div>
         </main>
 
         <!-- Mobile Bottom Navigation -->
         <nav class="mobile-bottom-nav">
+          <button class="mobile-nav-btn ${currentView === 'landing' ? 'active' : ''}" data-view="landing">
+            <i data-lucide="compass"></i>
+            <span>Overview</span>
+          </button>
           <button class="mobile-nav-btn ${currentView === 'dashboard' ? 'active' : ''}" data-view="dashboard">
             <i data-lucide="layout-dashboard"></i>
             <span>Home</span>
@@ -235,10 +329,6 @@ export class LakshmanRekhaApp {
           <button class="mobile-nav-btn ${currentView === 'agentGateway' ? 'active' : ''}" data-view="agentGateway">
             <i data-lucide="git-pull-request"></i>
             <span>Agents</span>
-          </button>
-          <button class="mobile-nav-btn ${currentView === 'privacyVault' ? 'active' : ''}" data-view="privacyVault">
-            <i data-lucide="database"></i>
-            <span>Vault</span>
           </button>
         </nav>
       </div>
@@ -281,9 +371,9 @@ export class LakshmanRekhaApp {
     return `
       <div class="modal-overlay" id="agent-action-modal">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header" style="margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 1.4rem;">🛑</span>
+              <span style="font-size: 1.5rem;">🛑</span>
               <div>
                 <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--rekha-gold-light);">
                   AI AGENT ACTION REQUEST
@@ -295,11 +385,11 @@ export class LakshmanRekhaApp {
             </div>
           </div>
 
-          <div class="modal-body">
+          <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
             <div style="padding: 14px; background: rgba(0,0,0,0.25); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 8px;">
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted); font-size: 0.8rem;">Requesting Agent:</span>
-                <strong style="font-size: 0.84rem;">${action.agentName}</strong>
+                <strong style="font-size: 0.84rem; color: #ffffff;">${action.agentName}</strong>
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted); font-size: 0.8rem;">Action Type:</span>
@@ -307,11 +397,11 @@ export class LakshmanRekhaApp {
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted); font-size: 0.8rem;">Target / Recipient:</span>
-                <strong style="font-size: 0.84rem;">${action.target}</strong>
+                <strong style="font-size: 0.84rem; color: #ffffff;">${action.target}</strong>
               </div>
               <div style="display: flex; justify-content: space-between;">
                 <span style="color: var(--text-muted); font-size: 0.8rem;">Calculated Risk Tier:</span>
-                <span class="badge ${action.risk === 'CRITICAL' ? 'badge-critical' : action.risk === 'HIGH' ? 'badge-high' : 'badge-medium'}">
+                <span class="badge ${action.risk === 'CRITICAL' ? 'badge-danger' : action.risk === 'HIGH' ? 'badge-warn' : 'badge-safe'}">
                   ${action.risk} RISK
                 </span>
               </div>
@@ -320,7 +410,7 @@ export class LakshmanRekhaApp {
             ${action.payload?.message ? `
               <div>
                 <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">Message Payload Content:</label>
-                <div style="padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 0.88rem;">
+                <div style="padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 0.88rem; color: #ffffff;">
                   "${action.payload.message}"
                 </div>
               </div>
@@ -331,17 +421,17 @@ export class LakshmanRekhaApp {
             </div>
           </div>
 
-          <div class="modal-footer">
+          <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
             <button class="btn btn-danger" id="btn-modal-deny">
-              <i data-lucide="x"></i>
+              <i data-lucide="x" style="width: 15px;"></i>
               Deny Action
             </button>
             <button class="btn btn-secondary" id="btn-modal-edit">
-              <i data-lucide="edit-3"></i>
+              <i data-lucide="edit-3" style="width: 15px;"></i>
               Edit Payload
             </button>
             <button class="btn btn-primary" id="btn-modal-allow-once">
-              <i data-lucide="check"></i>
+              <i data-lucide="check" style="width: 15px;"></i>
               Allow Once
             </button>
           </div>
@@ -358,6 +448,11 @@ export class LakshmanRekhaApp {
         e.preventDefault();
         const view = navTarget.getAttribute('data-view');
         this.store.setView(view);
+      }
+
+      // Command search buttons
+      if (e.target.closest('#btn-trigger-cmd-search') || e.target.closest('#btn-trigger-cmd-search-console')) {
+        if (this.commandPalette) this.commandPalette.open();
       }
 
       // Sidebar mobile drawer
@@ -509,14 +604,6 @@ export class LakshmanRekhaApp {
 
   attachViewSpecificHandlers(viewName) {
     // ----------------------------------------------------
-    // LANDING VIEW
-    // ----------------------------------------------------
-    if (viewName === 'landing') {
-      const launchBtn = document.getElementById('btn-hero-launch');
-      if (launchBtn) launchBtn.onclick = () => this.store.setView('dashboard');
-    }
-
-    // ----------------------------------------------------
     // DASHBOARD VIEW
     // ----------------------------------------------------
     if (viewName === 'dashboard') {
@@ -548,97 +635,64 @@ export class LakshmanRekhaApp {
       if (voiceBtn) {
         voiceBtn.onclick = () => {
           const indicator = document.getElementById('voice-status-indicator');
-          if (indicator) indicator.style.display = 'block';
-
-          voiceAssistant.startListening(
-            (transcript, isFinal) => {
+          if (voiceAssistant.isListening) {
+            voiceAssistant.stop();
+            if (indicator) indicator.style.display = 'none';
+          } else {
+            if (indicator) indicator.style.display = 'flex';
+            voiceAssistant.startListening((transcript, isFinal) => {
               if (textarea) textarea.value = transcript;
               if (isFinal) {
                 if (indicator) indicator.style.display = 'none';
-                this.showToast("Voice Transcribed", `Interpreted: "${transcript}"`, "info");
               }
-            },
-            () => {
+            }, (err) => {
+              this.showToast("Voice Recognition", err, "info");
               if (indicator) indicator.style.display = 'none';
-            }
-          );
+            });
+          }
         };
       }
 
-      // TTS audio playback
-      document.querySelectorAll('.btn-tts-speak').forEach(b => {
-        b.addEventListener('click', (e) => {
-          const text = decodeURIComponent(b.getAttribute('data-text') || '');
-          voiceAssistant.speak(text);
-        });
-      });
-
-      // Send Message pipeline
+      // Send Prompt through Lakshman Rekha Boundary Inspection
       const handleSend = async () => {
-        const rawText = textarea.value.trim();
-        if (!rawText) return;
+        const text = textarea.value.trim();
+        if (!text) return;
+        textarea.value = '';
 
-        // 1. Language Detection & Data Minimization check
-        const minim = dataMinimizer.minimize(rawText);
-        const prescanDrawer = document.getElementById('chat-prescan-drawer');
-
-        // 2. Security & Privacy Scan
-        const secReport = securityScanner.scanPrompt(rawText);
-        const privReport = privacyScanner.scanPrivacy(rawText);
-
-        // If Critical Prompt Injection detected, halt and show boundary intervention
+        // Step 1: Security Inspection
+        const secReport = securityScanner.scanPrompt(text);
         if (!secReport.isSafe && secReport.riskLevel === 'CRITICAL') {
-          this.store.recordAudit("Security Defense", "CRITICAL", "BLOCKED", `Neutralized prompt injection: "${secReport.threats[0]?.type}"`);
-          this.showToast("Boundary Alert", "CRITICAL Prompt Injection Intercepted!", "critical");
-
-          if (prescanDrawer) {
-            prescanDrawer.style.display = 'block';
-            prescanDrawer.innerHTML = `
-              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                <div>
-                  <div style="font-weight: 700; color: var(--status-danger); font-size: 0.9rem;">
-                    🛡️ LAKSHMAN REKHA HALTED TRANSMISSION: CRITICAL PROMPT INJECTION
-                  </div>
-                  <div style="font-size: 0.78rem; color: var(--text-secondary);">
-                    ${secReport.threats[0]?.explanation}
-                  </div>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                  <button class="btn btn-danger btn-sm" id="btn-drawer-block">Block Threat</button>
-                  <button class="btn btn-secondary btn-sm" id="btn-drawer-sanitize">Sanitize & Continue</button>
-                </div>
-              </div>
-            `;
-            document.getElementById('btn-drawer-block').onclick = () => {
-              prescanDrawer.style.display = 'none';
-              textarea.value = '';
-            };
-            document.getElementById('btn-drawer-sanitize').onclick = () => {
-              prescanDrawer.style.display = 'none';
-              this.proceedWithCleanSend("Explain safe security boundaries without overriding system prompt.");
-            };
-          }
+          this.store.recordAudit("Security Defense", "CRITICAL", "BLOCKED", `Neutralized prompt injection: "${text.substring(0, 35)}..."`);
+          this.store.addChatMessage({
+            id: `msg-${Date.now()}`,
+            role: "user",
+            content: text,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            scanMeta: secReport
+          });
+          this.store.addChatMessage({
+            id: `msg-${Date.now() + 1}`,
+            role: "ai",
+            content: "🚨 LAKSHMAN REKHA VIOLATION DETECTED: Prompt contains adversarial injection / jailbreak patterns. This input has been halted at the boundary.",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            scanMeta: { isViolationNotice: true }
+          });
+          this.showToast("Boundary Interception", "Prompt injection blocked.", "critical");
           return;
         }
 
-        // If PII or Secret detected, sanitize automatically
-        let textToSend = rawText;
-        let wasRedacted = false;
+        // Step 2: Privacy Inspection
+        const privReport = privacyScanner.scanPrivacy(text);
+        let safeText = text;
+
         if (privReport.hasSensitiveData) {
-          const redacted = redactionEngine.redact(rawText);
-          textToSend = redacted.redactedText;
-          wasRedacted = true;
-          this.store.recordAudit("Privacy Shield", "CRITICAL", "PROTECTED", `Redacted ${redacted.redactionsCount} sensitive items before external transmission`);
-          this.showToast("Privacy Shield", `${redacted.redactionsCount} sensitive secrets redacted.`, "success");
+          const redacted = redactionEngine.redact(text);
+          safeText = redacted.redactedText;
+          this.store.recordAudit("Privacy Shield", "HIGH", "PROTECTED", `Auto-redacted ${privReport.totalFound} sensitive entities`);
+          this.showToast("Zero-Leak Privacy", "Sensitive PII sanitized before external AI transmission.", "info");
         }
 
-        // Check if data minimization can prune fluff
-        if (minim.canMinimize) {
-          this.store.recordAudit("Privacy Shield", "LOW", "MINIMIZED", `Pruned biographical preamble (${minim.reductionPercentage}% reduction)`);
-        }
-
-        textarea.value = '';
-        await this.proceedWithCleanSend(textToSend, wasRedacted);
+        await this.proceedWithCleanSend(safeText, privReport.hasSensitiveData);
       };
 
       if (sendBtn) sendBtn.onclick = handleSend;
@@ -683,14 +737,14 @@ export class LakshmanRekhaApp {
               <div class="card" style="border-top: 3px solid ${report.isSafe ? 'var(--status-safe)' : 'var(--status-danger)'};">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                   <div>
-                    <h3 style="font-size: 1.15rem; font-weight: 700;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">
                       ${report.isSafe ? '✅ Safe Input Verified' : '🚨 Potential Threat Detected'}
                     </h3>
                     <span style="font-size: 0.78rem; color: var(--text-muted);">
                       Confidence Score: ${(report.threats[0]?.confidence ? Math.round(report.threats[0].confidence * 100) : 99)}%
                     </span>
                   </div>
-                  <span class="badge ${report.riskLevel === 'CRITICAL' ? 'badge-critical' : report.riskLevel === 'HIGH' ? 'badge-high' : 'badge-safe'}" style="font-size: 0.8rem; padding: 6px 12px;">
+                  <span class="badge ${report.riskLevel === 'CRITICAL' ? 'badge-danger' : report.riskLevel === 'HIGH' ? 'badge-warn' : 'badge-safe'}" style="font-size: 0.8rem; padding: 6px 12px;">
                     ${report.riskLevel} RISK
                   </span>
                 </div>
@@ -712,18 +766,20 @@ export class LakshmanRekhaApp {
                 `}
 
                 <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                  <button class="btn btn-secondary btn-sm" id="btn-sec-action-block">Block Threat</button>
-                  <button class="btn btn-primary btn-sm" id="btn-sec-action-copy">Copy Neutralized Version</button>
+                  <button class="btn btn-secondary btn-sm" id="btn-sec-copy">Copy Diagnostic JSON</button>
+                  <button class="btn btn-primary btn-sm" id="btn-sec-record">Log to Audit Vault</button>
                 </div>
               </div>
             `;
-            document.getElementById('btn-sec-action-block')?.addEventListener('click', () => {
-              this.store.recordAudit("Security Defense", report.riskLevel, "BLOCKED", "Adversarial prompt blocked in sandbox.");
-              this.showToast("Threat Neutralized", "Input safely blocked from reaching LLM context.", "success");
+
+            document.getElementById('btn-sec-copy')?.addEventListener('click', () => {
+              navigator.clipboard?.writeText(JSON.stringify(report, null, 2));
+              this.showToast("Copied", "Diagnostic payload copied to clipboard.", "info");
             });
-            document.getElementById('btn-sec-action-copy')?.addEventListener('click', () => {
-              navigator.clipboard?.writeText("Input sanitized by Lakshman Rekha AI.");
-              this.showToast("Copied", "Sanitized prompt copied to clipboard.", "info");
+
+            document.getElementById('btn-sec-record')?.addEventListener('click', () => {
+              this.store.recordAudit("Security Defense", report.riskLevel, report.isSafe ? "VERIFIED_SAFE" : "BLOCKED", `Scanned prompt input (${report.threats.length} threats)`);
+              this.showToast("Recorded", "Event committed to audit ledger.", "success");
             });
           }
         };
@@ -764,30 +820,28 @@ export class LakshmanRekhaApp {
               <div class="card" style="border-top: 3px solid var(--accent-cyan); margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                   <div>
-                    <h3 style="font-size: 1.15rem; font-weight: 700;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">
                       ${scan.hasSensitiveData ? `🔒 ${scan.totalFound} Sensitive Items Intercepted` : '✅ Zero PII Detected'}
                     </h3>
                     <span style="font-size: 0.78rem; color: var(--text-muted);">
                       PII & Secrets masked before boundary crossing
                     </span>
                   </div>
-                  <span class="badge ${scan.hasSensitiveData ? 'badge-high' : 'badge-safe'}">
+                  <span class="badge ${scan.hasSensitiveData ? 'badge-danger' : 'badge-safe'}">
                     ${scan.hasSensitiveData ? 'LEAK PREVENTED' : 'CLEAR'}
                   </span>
                 </div>
 
-                <!-- Detected Tags -->
                 ${scan.items.length > 0 ? `
                   <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
                     ${scan.items.map(item => `
-                      <span class="badge badge-redacted" style="padding: 6px 10px;">
+                      <span class="badge badge-warn" style="padding: 6px 10px;">
                         ${item.label}: ${item.rawPreview}
                       </span>
                     `).join('')}
                   </div>
                 ` : ''}
 
-                <!-- Redacted Preview Box -->
                 <div style="margin-bottom: 16px;">
                   <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px;">
                     Lakshman Rekha Autonomous Redaction Preview (What Third-Party AI Actually Receives):
@@ -798,7 +852,7 @@ export class LakshmanRekhaApp {
                 </div>
 
                 ${minim.canMinimize ? `
-                  <div style="padding: 12px 16px; background: rgba(6,182,212,0.08); border-radius: var(--radius-md); border: 1px solid var(--accent-cyan-glow); margin-bottom: 16px;">
+                  <div style="padding: 12px 16px; background: rgba(6,182,212,0.08); border-radius: var(--radius-md); border: 1px solid var(--border-cyan); margin-bottom: 16px;">
                     <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.86rem; margin-bottom: 4px;">
                       📉 Data Minimization Suggestion (-${minim.reductionPercentage}% fluff)
                     </div>
@@ -871,7 +925,7 @@ export class LakshmanRekhaApp {
                       ${report.assessmentLabel} (${report.supportedCount} verified claims, ${report.warningCount} requires scrutiny)
                     </span>
                   </div>
-                  <span class="badge ${report.trustScore >= 80 ? 'badge-safe' : 'badge-medium'}">
+                  <span class="badge ${report.trustScore >= 80 ? 'badge-safe' : 'badge-warn'}">
                     ${report.trustScore >= 80 ? 'HIGH FIDELITY' : 'REQUIRES SCRUTINY'}
                   </span>
                 </div>
@@ -880,12 +934,12 @@ export class LakshmanRekhaApp {
                   ${report.claims.map(claim => `
                     <div style="padding: 12px 14px; background: rgba(0,0,0,0.2); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
                       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <span class="badge ${claim.status === 'Supported' ? 'badge-safe' : 'badge-medium'}" style="font-size: 0.7rem;">
+                        <span class="badge ${claim.status === 'Supported' ? 'badge-safe' : 'badge-warn'}" style="font-size: 0.7rem;">
                           ${claim.status === 'Supported' ? '✓ Grounded' : '⚠️ Unverified Claim'}
                         </span>
                         <span style="font-size: 0.72rem; color: var(--text-muted);">Confidence: ${claim.confidence}%</span>
                       </div>
-                      <div style="font-size: 0.88rem; font-weight: 500; margin-bottom: 4px;">"${claim.claimText}"</div>
+                      <div style="font-size: 0.88rem; font-weight: 500; margin-bottom: 4px; color: #ffffff;">"${claim.claimText}"</div>
                       <div style="font-size: 0.76rem; color: var(--text-secondary);">Evidence: ${claim.evidence}</div>
                     </div>
                   `).join('')}
@@ -930,14 +984,14 @@ export class LakshmanRekhaApp {
               <div class="card" style="border-top: 3px solid ${report.hasCritical ? 'var(--status-danger)' : 'var(--status-safe)'}; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                   <div>
-                    <h3 style="font-size: 1.15rem; font-weight: 700;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">
                       Security Score: ${report.score} / 100
                     </h3>
                     <span style="font-size: 0.78rem; color: var(--text-muted);">
                       ${report.totalIssues} vulnerabilities identified in static analysis
                     </span>
                   </div>
-                  <span class="badge ${report.hasCritical ? 'badge-critical' : 'badge-safe'}">
+                  <span class="badge ${report.hasCritical ? 'badge-danger' : 'badge-safe'}">
                     ${report.hasCritical ? 'CRITICAL FLAWS FOUND' : 'PASS'}
                   </span>
                 </div>
@@ -948,7 +1002,7 @@ export class LakshmanRekhaApp {
                       <div style="padding: 12px 14px; background: rgba(0,0,0,0.25); border-radius: var(--radius-md); border-left: 3px solid var(--status-danger);">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                           <strong style="color: var(--status-danger); font-size: 0.88rem;">${iss.name} (Line ${iss.line})</strong>
-                          <span class="badge badge-critical">${iss.severity}</span>
+                          <span class="badge badge-danger">${iss.severity}</span>
                         </div>
                         <code class="font-mono" style="display: block; font-size: 0.78rem; color: #fecdd3; background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 4px; margin-bottom: 6px;">
                           ${iss.codeSnippet}
@@ -960,7 +1014,6 @@ export class LakshmanRekhaApp {
                   </div>
                 ` : ''}
 
-                <!-- Safer Code Proposal -->
                 <div>
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <label style="font-size: 0.84rem; font-weight: 700; color: var(--rekha-gold-light);">
@@ -1050,11 +1103,11 @@ export class LakshmanRekhaApp {
                     </h3>
                   </div>
 
-                  <div class="modal-body">
+                  <div class="modal-body" style="display: flex; flex-direction: column; gap: 10px; margin: 16px 0;">
                     <div style="padding: 12px; background: rgba(0,0,0,0.25); border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 6px;">
                       <div><strong>Recipient:</strong> ${inspection.recipient.name} (${inspection.recipient.phone})</div>
                       <div><strong>Contact Policy:</strong> ${inspection.recipient.policy}</div>
-                      <div><strong>Risk Level:</strong> <span class="badge ${inspection.risk === 'CRITICAL' ? 'badge-critical' : inspection.risk === 'HIGH' ? 'badge-high' : 'badge-safe'}">${inspection.risk} RISK</span></div>
+                      <div><strong>Risk Level:</strong> <span class="badge ${inspection.risk === 'CRITICAL' ? 'badge-danger' : inspection.risk === 'HIGH' ? 'badge-warn' : 'badge-safe'}">${inspection.risk} RISK</span></div>
                     </div>
 
                     ${inspection.warnings.length > 0 ? `
@@ -1063,12 +1116,12 @@ export class LakshmanRekhaApp {
                       </div>
                     ` : ''}
 
-                    <div style="padding: 12px; background: rgba(37,211,102,0.08); border-radius: var(--radius-md); border: 1px solid rgba(37,211,102,0.3); font-size: 0.9rem;">
+                    <div style="padding: 12px; background: rgba(37,211,102,0.08); border-radius: var(--radius-md); border: 1px solid rgba(37,211,102,0.3); font-size: 0.9rem; color: #ffffff;">
                       "${inspection.messageText}"
                     </div>
                   </div>
 
-                  <div class="modal-footer">
+                  <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
                     <button class="btn btn-secondary btn-sm" id="btn-wa-cancel">Cancel</button>
                     <button class="btn btn-primary btn-sm" id="btn-wa-confirm-send" style="background: #25D366; color: #070d18;">
                       Confirm & Send (SIMULATED)

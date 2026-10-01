@@ -4,7 +4,92 @@ export const en = {
     name: "LAKSHMAN REKHA AI",
     tagline: "Your Digital Boundary for Safe AI",
     statement: "Lakshman Rekha AI gives users control over what AI is allowed to KNOW, REMEMBER, PROCESS, and DO.",
-    subheading: "Protect your data. Detect AI threats. Verify AI answers. Control what AI is allowed to do."
+    subheading: "Protect your data. Detect AI threats. Verify what AI tells you. Stay in control."
+  },
+  header: {
+    protection: "Protection",
+    threatMonitor: "Threat Monitor",
+    verification: "Verification",
+    privacy: "Privacy",
+    console: "Console",
+    searchPlaceholder: "Search Lakshman Rekha... ⌘K",
+    perimeterActive: "Perimeter active",
+    perimeterNominal: "Perimeter nominal"
+  },
+  hero: {
+    eyebrow: "AI SECURITY • PRIVACY • TRUST",
+    title: "Your Digital Lakshman Rekha for AI.",
+    subhead: "Protect your data. Detect AI threats. Verify what AI tells you. Stay in control.",
+    tryBtn: "Try Lakshman Rekha",
+    exploreBtn: "Explore Protection",
+    statusIllustrative: "Illustrative perimeter active | Interactive product concept"
+  },
+  commandCenter: {
+    eyebrow: "LIVE PROTECTION PREVIEW",
+    title: "Protection command center",
+    threatsBlocked: "Threats blocked",
+    dataProtected: "Data protected",
+    responsesVerified: "AI responses verified",
+    perimeterStatus: "Perimeter status",
+    perimeterHealth: "Perimeter health",
+    integrityStable: "Boundary integrity is stable",
+    threatActivity: "Threat activity",
+    liveIllustrative: "LIVE / ILLUSTRATIVE",
+    safeVerified: "Safe · Verified response",
+    safeDesc: "Output checks passed within the trust boundary",
+    warnProtected: "Warning · Protected file access",
+    warnDesc: "Sensitive content was routed through privacy mode",
+    threatInjection: "Threat · Prompt injection",
+    threatDesc: "Illustrative malicious instruction prevented from execution"
+  },
+  simulator: {
+    eyebrow: "INTERACTIVE DEMO",
+    title: "Run a threat simulation",
+    readyNotice: "Ready for an illustrative simulation.",
+    promptInjection: "Prompt injection",
+    promptInjectionDesc: "Instruction override attempt",
+    dataExfiltration: "Data exfiltration",
+    dataExfiltrationDesc: "Suspicious data request",
+    hallucinatedClaim: "Hallucinated claim",
+    hallucinatedClaimDesc: "Unverified statement",
+    suspiciousLink: "Suspicious link",
+    suspiciousLinkDesc: "Potentially unsafe destination",
+    simulateBtn: "Simulate a threat",
+    replayBtn: "Replay",
+    resetBtn: "Reset"
+  },
+  protectiveLayer: {
+    eyebrow: "THE PROTECTIVE LAYER",
+    title: "Purpose-built for safer AI interaction.",
+    card1Title: "Protect your data",
+    card1Desc: "Create a clear boundary around sensitive context before it reaches an AI workflow.",
+    card2Title: "Detect AI threats",
+    card2Desc: "Surface suspicious signals and risky instructions in a focused, understandable view.",
+    card3Title: "Verify AI outputs",
+    card3Desc: "Bring verification cues into the flow before you rely on an AI-generated response.",
+    card4Title: "Stay in control",
+    card4Desc: "Adjust privacy, verification, and threat sensitivity to match the task at hand."
+  },
+  path: {
+    eyebrow: "HOW THE BOUNDARY WORKS",
+    title: "A clear path from signal to trust.",
+    step1Title: "Observe",
+    step1Desc: "Bring prompts, requests, files, and AI outputs into a single visible decision layer.",
+    step2Title: "Protect",
+    step2Desc: "Use a digital perimeter concept to flag or contain concerning instructions before they continue.",
+    step3Title: "Verify",
+    step3Desc: "Provide helpful trust signals so people remain informed and in control of AI-assisted work."
+  },
+  trustDesign: {
+    eyebrow: "TRUST BY DESIGN",
+    title: "Privacy and control stay at the center.",
+    desc: "Lakshman Rekha is designed as a calm control surface for navigating AI interactions—making boundaries, review moments, and trust signals easier to see.",
+    disclaimer: "This is an interactive template and product concept. It illustrates defensive boundary capabilities for hackathon demonstration.",
+    privacyMode: "Privacy mode",
+    privacyModeDesc: "Route sensitive content through an illustrative privacy layer.",
+    verificationMode: "Verification mode",
+    verificationModeDesc: "Validate assertions made in the dashboard preview.",
+    threatSensitivity: "Threat sensitivity"
   },
   nav: {
     dashboard: "Dashboard",
@@ -73,6 +158,6 @@ export const en = {
     placeholder: "Type a prompt or test an adversarial injection...",
     scanningNotice: "Lakshman Rekha is inspecting prompt before external AI transmission...",
     privacyModeOn: "Private Life Mode Active",
-    incognitoBanner: "🕶 PRIVATE SESSION ACTIVE: This conversation is excluded from your saved AI history and memory."
+    incognitoBanner: "🔒 PRIVATE SESSION ACTIVE: This conversation is excluded from your saved AI history and memory."
   }
 };

@@ -3,43 +3,51 @@
    "Your Digital Boundary for Safe AI"
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
   /* Core Brand Metaphor - Lakshman Rekha Sacred Boundary */
   --rekha-gold: #f59e0b;
   --rekha-gold-light: #fbbf24;
+  --rekha-gold-dark: #d97706;
   --rekha-gold-glow: rgba(245, 158, 11, 0.35);
-  --rekha-gold-subtle: rgba(245, 158, 11, 0.12);
-  
-  /* Cybernetic Surface Colors (Dark Mode Default) */
-  --bg-primary: #070d18;
-  --bg-secondary: #0c1527;
-  --bg-surface: #101c33;
-  --bg-surface-hover: #152442;
-  --bg-surface-active: #1a2c50;
-  --bg-glass: rgba(16, 28, 51, 0.75);
-  --bg-glass-heavy: rgba(11, 20, 38, 0.88);
-  
-  /* Accent Colors */
+  --rekha-gold-subtle: rgba(245, 158, 11, 0.1);
+  --rekha-gold-border: rgba(245, 158, 11, 0.3);
+
+  /* Futuristic Dark Base Colors */
+  --bg-primary: #05070d;
+  --bg-secondary: #080d1a;
+  --bg-surface: #0b1020;
+  --bg-surface-elevated: #0f162c;
+  --bg-surface-hover: #131c38;
+  --bg-surface-active: #182346;
+  --bg-glass: rgba(11, 16, 32, 0.72);
+  --bg-glass-heavy: rgba(8, 13, 26, 0.88);
+  --bg-glass-card: rgba(14, 21, 40, 0.6);
+
+  /* AI Technology Accents */
   --accent-cyan: #06b6d4;
-  --accent-cyan-glow: rgba(6, 182, 212, 0.3);
+  --accent-cyan-light: #38bdf8;
+  --accent-cyan-glow: rgba(6, 182, 212, 0.32);
+  --accent-cyan-subtle: rgba(6, 182, 212, 0.08);
   --accent-blue: #3b82f6;
-  --accent-purple: #8b5cf6;
-  
+  --accent-indigo: #6366f1;
+
   /* Status Colors */
   --status-safe: #10b981;
   --status-safe-bg: rgba(16, 185, 129, 0.12);
-  --status-safe-border: rgba(16, 185, 129, 0.3);
-  
+  --status-safe-border: rgba(16, 185, 129, 0.32);
+  --status-safe-glow: rgba(16, 185, 129, 0.35);
+
   --status-warn: #f59e0b;
   --status-warn-bg: rgba(245, 158, 11, 0.12);
-  --status-warn-border: rgba(245, 158, 11, 0.3);
-  
-  --status-danger: #f43f5e;
-  --status-danger-bg: rgba(244, 63, 94, 0.12);
-  --status-danger-border: rgba(244, 63, 94, 0.3);
-  
+  --status-warn-border: rgba(245, 158, 11, 0.32);
+
+  --status-danger: #ef4444;
+  --status-danger-bg: rgba(239, 68, 68, 0.12);
+  --status-danger-border: rgba(239, 68, 68, 0.35);
+  --status-danger-glow: rgba(239, 68, 68, 0.4);
+
   --status-info: #0284c7;
   --status-info-bg: rgba(2, 132, 199, 0.12);
   --status-info-border: rgba(2, 132, 199, 0.3);
@@ -48,50 +56,58 @@
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --text-inverted: #070d18;
-  
+  --text-dim: #475569;
+  --text-inverted: #05070d;
+
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.14);
-  --border-gold: rgba(245, 158, 11, 0.4);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-prominent: rgba(255, 255, 255, 0.18);
+  --border-gold: rgba(245, 158, 11, 0.35);
+  --border-cyan: rgba(6, 182, 212, 0.3);
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.5);
-  --shadow-gold: 0 0 25px -3px var(--rekha-gold-glow);
-  --shadow-cyan: 0 0 25px -3px var(--accent-cyan-glow);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 14px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 30px -3px rgba(0, 0, 0, 0.6);
+  --shadow-gold: 0 0 30px -4px var(--rekha-gold-glow);
+  --shadow-cyan: 0 0 30px -4px var(--accent-cyan-glow);
+  --shadow-danger: 0 0 30px -4px var(--status-danger-glow);
 
-  /* Layout */
+  /* Layout Spacing */
   --sidebar-width: 270px;
-  --header-height: 64px;
+  --header-height: 70px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 22px;
+  --radius-2xl: 30px;
   --radius-full: 9999px;
-  
+
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Light Theme Variables */
+/* Light Theme Variables (Fallback) */
 [data-theme="light"] {
   --bg-primary: #f8fafc;
   --bg-secondary: #f1f5f9;
   --bg-surface: #ffffff;
-  --bg-surface-hover: #f8fafc;
+  --bg-surface-elevated: #f8fafc;
+  --bg-surface-hover: #f1f5f9;
   --bg-surface-active: #e2e8f0;
   --bg-glass: rgba(255, 255, 255, 0.85);
   --bg-glass-heavy: rgba(255, 255, 255, 0.95);
-  
+  --bg-glass-card: rgba(255, 255, 255, 0.8);
+
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #64748b;
+  --text-dim: #94a3b8;
   --text-inverted: #f8fafc;
-  
+
   --border-subtle: rgba(15, 23, 42, 0.08);
   --border-medium: rgba(15, 23, 42, 0.16);
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -113,7 +129,7 @@ html, body {
   color: var(--text-primary);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -141,42 +157,46 @@ button, input, textarea, select {
   min-height: 100vh;
   width: 100%;
   position: relative;
+  background-color: var(--bg-primary);
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.04) 0%, transparent 45%);
+    radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.04) 0%, transparent 45%),
+    radial-gradient(circle at 90% 15%, rgba(6, 182, 212, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(16, 28, 51, 0.6) 0%, transparent 70%);
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(5, 7, 13, 0.5);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(245, 158, 11, 0.4);
 }
 
-/* Utility Animations */
+/* Core Keyframe Animations */
 @keyframes rekhaPulse {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3), inset 0 0 15px rgba(245, 158, 11, 0.2);
-    border-color: rgba(245, 158, 11, 0.6);
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3), inset 0 0 15px rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.45);
   }
   50% {
-    box-shadow: 0 0 30px rgba(245, 158, 11, 0.55), inset 0 0 25px rgba(245, 158, 11, 0.35);
-    border-color: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.65), inset 0 0 25px rgba(245, 158, 11, 0.3);
+    border-color: rgba(251, 191, 36, 0.85);
   }
 }
 
-@keyframes scanLine {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(1000%); }
+@keyframes scanLineGlow {
+  0% { transform: translateY(-100%); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(800%); opacity: 0; }
 }
 
 @keyframes spinSlow {
@@ -184,9 +204,29 @@ button, input, textarea, select {
   to { transform: rotate(360deg); }
 }
 
+@keyframes spinReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes rippleWave {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blockedFlash {
+  0% { background: rgba(239, 68, 68, 0.4); border-color: #ef4444; }
+  100% { background: transparent; border-color: inherit; }
 }
 
 .animate-fade-in {
@@ -195,4 +235,14 @@ button, input, textarea, select {
 
 .rekha-boundary-glow {
   animation: rekhaPulse 3.5s infinite ease-in-out;
+}
+
+/* Reduced Motion Respect */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

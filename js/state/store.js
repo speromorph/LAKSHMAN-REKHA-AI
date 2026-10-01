@@ -6,7 +6,7 @@
 
 export const store = {
   state: {
-    currentView: 'dashboard',
+    currentView: 'landing',
     language: 'en',
     theme: 'dark',
     highContrast: false,
